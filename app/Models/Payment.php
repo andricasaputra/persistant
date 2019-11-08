@@ -63,6 +63,6 @@ class Payment extends Model
 
     public function users()
     {
-        return $this->belongsTo(Payment::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

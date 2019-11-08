@@ -10,6 +10,7 @@ class PackageController extends Controller
     public function __construct()
 	{
 		$this->middleware('expired')->only('index');
+        $this->middleware('payments.status')->only('index');
 	}
 
     public function index()

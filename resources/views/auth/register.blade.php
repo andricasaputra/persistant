@@ -22,7 +22,7 @@
             </span>
 
             <div class="wrap-input100 validate-input">
-                <select name="package" class="input100" required>
+                <select name="id" class="input100" required>
                     <option value="" disabled selected>-Pilih Paket-</option>
                     @foreach($packages as $package)
                         @if($package->name == 'trial')

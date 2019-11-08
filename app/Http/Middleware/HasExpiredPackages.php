@@ -23,7 +23,7 @@ class HasExpiredPackages
      */
     public function handle($request, Closure $next)
     {
-        if ($this->repository->isExpiredPackage()) return $next($request);
+        if ($this->repository->isExpiredPackage() || trial()) return $next($request);
            
         return redirect(route('home'))->withWarning('Maaf paket anda masih aktif, anda tidak dapat membeli paket lainnya!');
     }

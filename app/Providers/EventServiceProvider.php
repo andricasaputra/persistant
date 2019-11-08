@@ -21,6 +21,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\UserRegister' => [
             'App\Listeners\UserRegisterNotification',
          ],
+         'App\Events\UserJobFailedEvent' => [
+            'App\Listeners\UserJobFailedListener',
+         ]
     ];
 
     /**

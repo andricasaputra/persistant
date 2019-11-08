@@ -24,7 +24,7 @@ class UserRegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'package' => ['required'],
+            'id' => ['required'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/(.*)@pertanian\.go.id/i'],
             'password' => ['required', 'string', 'min:4', 'confirmed'],
         ];

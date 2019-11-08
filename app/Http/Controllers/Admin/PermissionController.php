@@ -16,7 +16,7 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissions = Permission::all(); //Get all permissions
+        $permissions = Permission::all();
 
         return view('admin.permissions.index')->withPermissions($permissions);
     }
@@ -28,7 +28,7 @@ class PermissionController extends Controller
      */
     public function create()
     {
-        $roles = Role::get(); //Get all roles
+        $roles = Role::get();
 
         return view('admin.permissions.create')->withRoles($roles);
     }
@@ -67,7 +67,7 @@ class PermissionController extends Controller
 
         }
 
-        return redirect()->route('permissions.index')->withSuccess('Permission '. $permission->name.' added!');
+        return redirect()->route('permissions.index')->withSuccess('Permission '. $permission->name .' added!');
     }
 
     /**
@@ -112,7 +112,7 @@ class PermissionController extends Controller
         $input = $request->all();
         $permission->fill($input)->save();
 
-        return redirect()->route('permissions.index')->withSuccess('Permission '. $permission->name.' updated!');
+        return redirect()->route('permissions.index')->withSuccess('Permission '. $permission->name .' updated!');
     }
 
     /**

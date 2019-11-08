@@ -17,7 +17,7 @@ class IsUser
     {
         if (customer()) {
 
-            app()->register(\App\Providers\EpersonalServiceProvider::class);
+            //app()->register(\App\Providers\EpersonalServiceProvider::class);
 
             return $next($request);
         } 

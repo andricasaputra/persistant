@@ -9,16 +9,23 @@ use Illuminate\Support\Facades\Hash;
 
 class UserRepository
 {
-    use hasPackage;
+    use hasPackage, hasPayments;
+
+    protected $profile = [];
 
     public function user()
     {
         return auth()->user();
     }
 
-    public function profile()
+    public function getProfile($key = null)
     {
-        return app('Profile');
+        return isset($key) ? $this->profile[$key] : $this->profile;
+    }
+
+    public function setProfile(array $profile) 
+    {
+        $this->profile = $profile;
     }
 
 	public function all()
@@ -39,7 +46,7 @@ class UserRepository
             'e_password' => $request->password,
         ]);
 
-        event(new UserRegister($user, $request->package));
+        event(new UserRegister($user, $request->id, $request->all()));
 
         return $user;
 	}

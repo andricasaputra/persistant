@@ -7,7 +7,7 @@ use App\Repositories\UserRepository;
 
 class ProfileComposer
 {
-    protected $user;
+    protected $repository;
 
 	/**
      * Create a new profile composer.
@@ -15,9 +15,9 @@ class ProfileComposer
      * @param  UserRepository  $users
      * @return void
      */
-    public function __construct(UserRepository $user)
+    public function __construct(UserRepository $repository)
     {
-        $this->user = $user;
+        $this->repository = $repository;
     }
 
     /**
@@ -28,7 +28,23 @@ class ProfileComposer
      */
     public function compose(View $view)
     {
-        $view->with('profile', app('Profile'));
-        $view->with('package', $this->user->packageInfo());
+        if (! session()->has('profile')) {
+
+            session()->put('profile', app('Profile'));
+        }
+
+        $profile = session('profile', function(){
+
+            //callback
+            session()->put('callback_profile', app('Profile'));
+
+            return 'callback_profile';
+        });
+
+        $this->repository->setProfile($profile);
+
+        $view->with('profile', $this->repository->getProfile());
+        $view->with('package', $this->repository->packageInfo());
     }
+
 }

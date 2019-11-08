@@ -13,6 +13,6 @@ class PaymentsFactory
 			return 'simple payment class';
 		}
 
-		throw new \Exception("Not payments driver supported", 1);
+		throw new \Exception("Theres no payments driver supported", 1);
 	}
 }

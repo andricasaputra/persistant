@@ -82,7 +82,7 @@ class UserManagementController extends Controller
 
         $packages = Package::all()->pluck('name', 'id');
 
-        return view('admin.users.edit', compact('user', 'roles', 'packages')); //pass user and roles data to view
+        return view('admin.users.edit', compact('user', 'roles', 'packages')); 
     }
 
     /**

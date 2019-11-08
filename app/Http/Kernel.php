@@ -67,6 +67,8 @@ class Kernel extends HttpKernel
         'active' => \App\Http\Middleware\HasActivePackages::class,
         'expired' => \App\Http\Middleware\HasExpiredPackages::class,
         'packageCheck' => \App\Http\Middleware\CheckPackage::class,
+        'payments.status' => \App\Http\Middleware\HasPayments::class,
+        'user.setting' => \App\Http\Middleware\UploadSetting::class,
     ];
 
     /**
@@ -84,5 +86,9 @@ class Kernel extends HttpKernel
         \Illuminate\Session\Middleware\AuthenticateSession::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
         \Illuminate\Auth\Middleware\Authorize::class,
+        \App\Http\Middleware\CheckPackage::class,
+        \App\Http\Middleware\HasActivePackages::class,
+        \App\Http\Middleware\HasExpiredPackages::class,
+        \App\Http\Middleware\HasPayments::class,
     ];
 }

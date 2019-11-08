@@ -124,7 +124,7 @@ class RoleController extends Controller
             }
         }
 
-        return redirect()->route('roles.index')->withSuccess('Role '. $role->name.' updated!');
+        return redirect()->route('roles.index')->withSuccess('Role '. $role->name .' updated!');
     }
 
     /**

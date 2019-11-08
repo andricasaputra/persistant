@@ -4,19 +4,6 @@
     <!-- ============================================================== -->
     <div class="navbar-header">
         <a class="navbar-brand" href="{{ route('home') }}">
-            <!-- Logo icon -->
-            <b>
-                <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-                <!-- Dark Logo icon -->
-                {{-- <img src="{{ asset("images/logo-icon.png") }}" class="dark-logo" /> --}}
-                <i class="wi wi-sunset"></i>
-            </b>
-            <!--End Logo icon -->
-            <!-- Logo text -->
-            <span>
-                <!-- dark Logo text -->
-                {{-- <img src="{{ asset("images/logo-text.png") }}" class="dark-logo" /> --}}
-            </span>
         </a>
     </div>
     <!-- ============================================================== -->
@@ -28,7 +15,7 @@
         <!-- ============================================================== -->
         <ul class="navbar-nav mr-auto mt-md-0 ">
             <!-- This is  -->
-            <li class="nav-item dropdown" style="margin: auto;">
+           {{--  <li class="nav-item dropdown" style="margin: auto;">
               <a href="#" id="btnNotifications" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="badge-container">
                   <span class="badge badge-pill badge-danger dropdown-count"></span>
@@ -45,14 +32,14 @@
                    </li>
                 </ul>
               </div>
-            </li>
+            </li> --}}
         </ul>
         <!-- ============================================================== -->
         <!-- User profile and search -->
         <!-- ============================================================== -->
         <ul class="navbar-nav my-lg-0">
             <li class="nav-item dropdown">
-                <a id="profileNav" class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" data-src="{{ $profile['nip'] }}" aria-haspopup="true" aria-expanded="false" >{{ $profile['nama'] }}</a>
+                <a id="profileNav" class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="#" data-toggle="dropdown" data-src="{{ $profile['nip'] }}" aria-haspopup="true" aria-expanded="false" >{{ $profile['nama'] }}</a>
             </li>
 
         </ul>

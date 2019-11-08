@@ -15,8 +15,17 @@
             <li>
                 <a href="{{ route('upload') }}" class="waves-effect"><i class="fa fa-cloud-upload m-r-10" aria-hidden="true"></i>Upload Aktivitas</a>
             </li>
+            @if(auth()->user()->setting()->first()->upload_setting == 'async')
+                <li>
+                    <a href="{{ route('failed') }}" class="waves-effect"><i class="fa fa-cloud-upload m-r-10" aria-hidden="true"></i>Data Gagal Upload</a>
+                </li>
+            @endif
             <li>
-                <a href="{{ route('package.list') }}" class="waves-effect"><i class="fa fa-gift m-r-10" aria-hidden="true"></i>Paket</a>
+                <a href="{{ route('package.list') }}" class="waves-effect"><i class="fa fa-gift m-r-10" aria-hidden="true"></i>Order</a>
+            </li>
+            <li>
+                <a href="{{ route('setting.index') }}" class="waves-effect">
+                <i class="fa fa-gear m-r-10"></i> Setting</i></a>
             </li>
             <li>
                 <a href="{{ route('logout') }}" class="waves-effect" onclick="event.preventDefault();

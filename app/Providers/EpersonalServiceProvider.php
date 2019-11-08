@@ -4,9 +4,9 @@ namespace App\Providers;
 
 use Goutte\Client;
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Payments\PaymentsFactory;
+use Illuminate\Contracts\Support\DeferrableProvider;
 
-class EpersonalServiceProvider extends ServiceProvider
+class EpersonalServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register services.
@@ -20,7 +20,6 @@ class EpersonalServiceProvider extends ServiceProvider
         $this->logout(); 
 
         $this->getProfile();
-  
     }
 
     /**
@@ -117,5 +116,10 @@ class EpersonalServiceProvider extends ServiceProvider
             }
 
         });
+    }
+
+    public function provides()
+    {
+        return [Client::class, 'Logout', 'Profile'];
     }
 }

@@ -55,4 +55,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function setting()
+    {
+        return $this->hasOne(UserSetting::class);
+    }
+
+    public function failedJob()
+    {
+        return $this->hasMany(UserFailedJobs::class);
+    }
 }

@@ -18,6 +18,9 @@ return [
         'addActivity' => 'http://ekinerja.pertanian.go.id/epersonalv2/mpribadi/add2.php',
         'login' => 'http://ekinerja.pertanian.go.id/epersonalv2/index.php',
         'profile' => 'http://ekinerja.pertanian.go.id/epersonalv2/mpribadi/index.php',
+        'proxy' => 'https://cors-anywhere.herokuapp.com/',
+        'skpBulanan' => 'http://ekinerja.pertanian.go.id/epersonalv2/ekinerjav2/mlog/getSkpBulan.php',
+        'kuantitasSkp' => 'http://ekinerja.pertanian.go.id/epersonalv2/ekinerjav2/mlog/getKuantitas.php',
     ],
 
     /*
@@ -32,6 +35,10 @@ return [
         'trial' => 0,
         'bulanan' => 25000,
         'tahunan' => (25000 * 12) - ((25000 * 12) * 0.2)
+    ],
+
+    'payments_gateway' => [
+        'default' => 'midtrans'
     ],
 
 ];

@@ -53,7 +53,10 @@ class EpersonalImport implements ToCollection, WithMultipleSheets, WithHeadingRo
     {
     	return $rows->map(function($row){
 
-    		$row["tanggal"] = $this->transformDate($row["tanggal"])->toDateString();
+    		$row['tanggal'] = $this->transformDate($row['tanggal'])->toDateString();
+            $row['kuantitas_skp'] = (int) $row['kuantitas_skp'];
+            $row['waktu'] = number_format($row['waktu'], 2);
+            $row['waktu_sd'] = number_format($row['waktu_sd'], 2);
 
     		return $row;
     	});

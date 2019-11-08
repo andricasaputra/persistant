@@ -49,14 +49,14 @@
                             <input type="date" class="form-control" name="bulan" value="{{ date('Y-m-d') }}">
                         </div>
                         <div class="form-group">
+                            <div id="loader"></div>
                             <label class="col-md-12 m-b-30">Pilih Butir Kegiatan</label>
                             <select id="butir_kegiatan" class="form-control" name="butir_kegiatan" style="width:auto;">
-                                <option value="-">Pilih Butir</option>
                             </select>
                         </div>
-                        <div class="form-group" >
+                        {{-- <div class="form-group" >
                             <div id="detail_nilai" class="form-group form-inline col-md-12"></div>
-                        </div>
+                        </div> --}}
                         <div class="form-group">
                             <label class="col-md-12 m-b-30">Pilih File</label>
                             <div class="col-md-12">
@@ -84,19 +84,23 @@
 
 <script>
 
-    const baseUrl = 'http://ekinerja.pertanian.go.id/epersonalv2/ekinerjav2/mlog/';
+    const baseUrl = '{{ config('e-persistant.uri.log') }}';
 
-    const skpBulanUrl = baseUrl + 'getSkpBulan.php';
+    const skpBulanUrl = '{{ config('e-persistant.uri.skpBulanan') }}';
 
-    const kuantitasUrl = baseUrl + 'getKuantitas.php';
+    const kuantitasUrl = '{{ config('e-persistant.uri.kuantitasSkp') }}';
 
-    const proxy = 'https://cors-anywhere.herokuapp.com/';
+    const proxy = '{{ config('e-persistant.uri.proxy') }}';
 
-    let nip = $('a#profileNav').data('src');
+    let nip = $('a#profileNav').data('src');;
 
     let tanggal = $('input[name="bulan"]');
 
     function getSkpBulanNew(tanggal) {
+
+       $('#butir_kegiatan').empty();
+
+       $('#butir_kegiatan').prepend(`<option value="-"><i class="fa fa-spin fa-spinner"></i> Loading Butir Kegiatan...</option>`);
 
         $.ajax({
             url: proxy + skpBulanUrl,
@@ -106,6 +110,14 @@
                 $('#butir_kegiatan').empty();
                 
                 $('#butir_kegiatan').html(data);
+
+                $('#butir_kegiatan').prop('disabled', false);
+            },
+            error: function(err){
+
+                alert('E-personal error saat load data butir kegiatan anda, silahkan coba lagi dalam beberapa saat');
+
+                location.reload();
             }
         });
 
@@ -121,15 +133,15 @@
     });
 
     // Panggil kuantitas sesuai butir kegiatan yang dipilih
-    $('#butir_kegiatan').on('change', function(){
+    // $('#butir_kegiatan').on('change', function(){
 
-        let id = $(this).val();
+    //     let id = $(this).val();
 
-        $('#detail_nilai')
-        .html('<div style="margin: auto"><i class="fa fa-spin fa-spinner"></i></div>')
-        .load(proxy + kuantitasUrl + '?id=' + id);
+    //     $('#detail_nilai')
+    //     .html('<div style="margin: auto"><i class="fa fa-spin fa-spinner"></i></div>')
+    //     .load(proxy + kuantitasUrl + '?id=' + id);
 
-    });
+    // });
 
 </script>
 

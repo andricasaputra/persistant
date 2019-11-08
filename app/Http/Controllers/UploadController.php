@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Http\Requests\UploadRequest;
-use App\Repositories\UploadRepository;
+use Illuminate\Support\Facades\Artisan;
+use App\Repositories\Uploads\UploadFactory as Factory;
 
 class UploadController extends Controller
 {
-	protected $destinationUri;
-
 	public function __construct()
 	{
-		$this->destinationUri = config('e-persistant.uri.log');
+		$this->middleware('user.setting')->only(['showFailedJob', 'action']);
 	}
 
     public function upload()
@@ -21,7 +21,9 @@ class UploadController extends Controller
 
 	public function create(UploadRequest $request)
 	{
-		$upload = (new UploadRepository)->make($this->destinationUri);
+		$factory = Factory::init($request);
+
+		$upload = $factory->make();
 
 		if ($upload === false) {
 
@@ -30,4 +32,46 @@ class UploadController extends Controller
 
 		return back()->withSuccess("$upload data berhasil diupload ke E-Personal anda");
 	}
+
+	public function showFailedJob()
+	{
+		$datas = auth()->user()->failedJob()->get();
+
+		$datas->each(function($data){
+
+			$data['datas'] = json_decode($data['datas'], true);
+
+			return $data;
+		});
+		
+		return view('failed')->withFails($datas);
+	}
+
+	public function action(Request $request)
+	{
+		if ($request->type == 'retry') {
+			$this->retry($request);
+		} elseif ($request->type == 'forget') {
+			$this->forget($request);
+		}
+	}
+
+	protected function retry(Request $request)
+	{
+		$retry = Artisan::call('queue:retry', ['id' => $request->id]);
+
+		session()->flash('success', 'Data berhasil dimasukkan kembali ke dalam antrian upload');
+		
+		return response()->json($retry);
+	}
+
+	protected function forget(Request $request)
+	{
+		$forget = Artisan::call('queue:forget', ['id' => $request->id]);
+
+		session()->flash('success', 'Data berhasil dihapus');
+
+		return response()->json($forget);
+	}
+
 }

@@ -475,41 +475,7 @@
                         <!--//PRICE CONTENT END-->
                             
                     </div>
-                @endforeach
-                {{-- <div class="col-md-6">
-                
-                    <div class="generic_content clearfix">
-                        
-                        <div class="generic_head_price clearfix">
-
-                            <div class="generic_head_content clearfix">
-                            
-                                <div class="head_bg"></div>
-                                <div class="head">
-                                    <span>Bulanan</span>
-                                </div>
-                         
-                            </div>
-
-                            <div class="generic_price_tag clearfix">	
-                                <span class="price">
-                                    <span class="sign">Rp</span>
-                                    <span class="currency">25</span>
-                                    <span class="cent">.000</span>
-                                    <span class="month">/Bulan</span>
-                                </span>
-                            </div>
-
-                        </div>                            
-
-   
-                        <div class="generic_price_btn clearfix">
-                        	<a href="#" data-src="bulanan">Pilih</a>
-                        </div>
-                         
-                    </div>
-                        
-                </div> --}}    
+                @endforeach  
 
             </div>	
             <!--//BLOCK ROW END-->
@@ -518,14 +484,16 @@
         
     </div>
 
-    <pre><div id="result-json">JSON result will appear here after payment:<br></div></pre> 
-
 </div>
 
 @section('extra_script')
 <script src="{{ !config('services.midtrans.isProduction') ? 'https://app.sandbox.midtrans.com/snap/snap.js' : 'https://app.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('services.midtrans.clientKey') }}"></script>
 <script>
     function submitForm(id) {
+
+        const submitbtn = $('input[type="submit"]').attr('disabled', true);
+
+        console.log(submitbtn)
 
         $.post("{{ route('payment.store') }}",
         {
@@ -539,12 +507,11 @@
             snap.pay(data.snap_token, {
                 // Optional
                 onSuccess: function (result) {
-                    //location.reload();
+                    window.location('/list')
                 },
                 // Optional
                 onPending: function (result) {
-                    document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
-                    //location.reload();
+                    window.location('/list')
                 },
                 // Optional
                 onError: function (result) {

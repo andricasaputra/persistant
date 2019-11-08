@@ -7,6 +7,7 @@ use Veritrans_Snap;
 use Veritrans_Config;
 use App\Models\Package;
 use App\Models\Payment;
+use Veritrans_Transaction;
 use Veritrans_Notification;
 
 class VeritransRepository implements PaymentsInterface
@@ -20,13 +21,15 @@ class VeritransRepository implements PaymentsInterface
         Veritrans_Config::$is3ds = config('services.midtrans.is3ds');
 	}
 
-	public function submit($request)
+	public function submit($request, $user = null)
 	{
 		DB::beginTransaction();
+
+		$request = is_array($request) ? (object) $request : $request;
     		
     	try {
 
-    		$user = auth()->user();
+    		$user = isset($user) ? $user : auth()->user();
 
 	        $package = Package::find($request->id);
 
@@ -79,6 +82,32 @@ class VeritransRepository implements PaymentsInterface
     	}
 	}
 
+	public function status($id)
+	{
+		$payment = Payment::find($id);
+
+		if ($payment->package_type != 'trial') {
+
+			$status = Veritrans_Transaction::status($id);
+
+			// Jika status payment user tidak sama dengan midtrans
+			// transaction status, maka update status payment user
+			if ($payment->status != $status->transaction_status) {
+
+				$payment->update(['status' => $status->transaction_status]);
+
+				$this->updatePackage($payment);
+			}
+
+		} else {
+
+			$status = null;
+
+		}
+
+		return $status;
+	}
+
 	/**
      * Midtrans notification handler.
      *
@@ -86,7 +115,7 @@ class VeritransRepository implements PaymentsInterface
      * 
      * @return void
      */
-    public function notification($request)
+    public function notification()
     {
     	DB::beginTransaction();
 
@@ -106,13 +135,11 @@ class VeritransRepository implements PaymentsInterface
 		        if ($type == 'credit_card') {
 
 		          if($fraud == 'challenge') {
-		            // TODO set payment status in merchant's database to 'Challenge by FDS'
-		            // TODO merchant should decide whether this transaction is authorized or not in MAP
-		            // $payment->addUpdate("Transaction order_id: " . $orderId ." is challenged by FDS");
+
 		            $payment->setPending();
+
 		          } else {
-		            // TODO set payment status in merchant's database to 'Success'
-		            // $payment->addUpdate("Transaction order_id: " . $orderId ." successfully captured using " . $type);
+
 		            $payment->setSuccess();
 		          }
 
@@ -120,32 +147,25 @@ class VeritransRepository implements PaymentsInterface
 
 		    } elseif ($transaction == 'settlement') {
 
-		        // TODO set payment status in merchant's database to 'Settlement'
-		        // $payment->addUpdate("Transaction order_id: " . $orderId ." successfully transfered using " . $type);
 		        $payment->setSuccess();
+		        
+		        // Update user paket dan roles
+		        $this->updatePackage($payment);
 
 		    } elseif($transaction == 'pending'){
 
-		        // TODO set payment status in merchant's database to 'Pending'
-		        // $payment->addUpdate("Waiting customer to finish transaction order_id: " . $orderId . " using " . $type);
 		        $payment->setPending();
 
 		    } elseif ($transaction == 'deny') {
 
-		        // TODO set payment status in merchant's database to 'Failed'
-		        // $payment->addUpdate("Payment using " . $type . " for transaction order_id: " . $orderId . " is Failed.");
 		        $payment->setFailed();
 
 		    } elseif ($transaction == 'expire') {
 
-		        // TODO set payment status in merchant's database to 'expire'
-		        // $payment->addUpdate("Payment using " . $type . " for transaction order_id: " . $orderId . " is expired.");
 		        $payment->setExpired();
 
 		    } elseif ($transaction == 'cancel') {
 
-		        // TODO set payment status in merchant's database to 'Failed'
-		        // $payment->addUpdate("Payment using " . $type . " for transaction order_id: " . $orderId . " is canceled.");
 		        $payment->setFailed();
 
 		    }
@@ -159,5 +179,19 @@ class VeritransRepository implements PaymentsInterface
     		throw new \Exception($e->getMessage(), 1);
     	}
 
+    }
+    
+    protected function updatePackage($payment)
+    {
+        $package = Package::whereName($payment->package_type)->first();
+
+	    $payment->users->packages()->detach();
+	    
+	    $payment->users->packages()->attach($package->id, [
+            'valid_until' => now()->addMonths((int) $package->lifetime), 
+            'created_at' => now()
+        ]);
+        
+        $payment->users->syncRoles(2,3);
     }
 }

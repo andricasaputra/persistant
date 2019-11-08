@@ -19,9 +19,15 @@ class PaymentController extends Controller
      */
     public function __construct(Request $request)
     {
-    	$this->request = $request;
+    	$this->middleware('expired')->only('submitPayment');
 
-    	$this->repository = app('Payments')->init($request->driver);
+    	$this->request = $request;
+    	
+    	$driver = $request->has('driver') 
+                  ? $request->driver 
+                  : config('e-persistant.payments_gateway.default'); 
+
+    	$this->repository = app('Payments')->init($driver);
     }
  
     /**
@@ -33,7 +39,7 @@ class PaymentController extends Controller
     {
         $payments = Payment::latest()->paginate(8);
  
-        return view('payments')->withpayments($payments);
+        return view('payments')->withPayments($payments);
     }
  
     /**
@@ -47,6 +53,29 @@ class PaymentController extends Controller
 
 		return response()->json($response);
     }
+
+    /**
+     * Midtrans notification handler.
+     *
+     * @param Request $request
+     * 
+     * @return void
+     */
+    public function status($id)
+    { 
+        $status = $this->repository->status($id);
+
+        if (trial() && is_null($status)) {
+
+            return view('package.trial_status');
+
+        } else {
+
+            return view('package.payment_status')->withStatus($status);
+        }
+
+        return back()->withWarning('Kami tidak dapat menemukan status order anda');
+    }
  
     /**
      * Midtrans notification handler.
@@ -57,6 +86,6 @@ class PaymentController extends Controller
      */
     public function notificationHandler()
     {
-    	$this->repository->notification($this->request);	
+    	$this->repository->notification();	
     }
 }

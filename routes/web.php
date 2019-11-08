@@ -8,13 +8,17 @@ Route::middleware('auth')->group(function(){
 
 	Route::middleware(['packageCheck', 'user'])->group(function(){
 
-		Route::middleware('active')->group(function(){
+		Route::middleware(['active', 'payments.status'])->group(function(){
 
 			Route::get('/log', 'UserController@log')->name('log');
 
 			Route::get('/upload', 'UploadController@upload')->name('upload');
 
 			Route::post('/create', 'UploadController@create')->name('create');
+
+			Route::get('/upload/failed', 'UploadController@showFailedJob')->name('failed');
+
+			Route::post('/upload/failed/action', 'UploadController@action')->name('failed.action');
 
 		});
 
@@ -28,13 +32,16 @@ Route::middleware('auth')->group(function(){
 
 		Route::get('/payment', 'PaymentController@index')->name('payment');
 
-		Route::post('/payment/finish', function(){
-		    return redirect()->route('payment');
-		})->name('payment.finish');
+		Route::get('/payment/status/{id}', 'PaymentController@status')->name('payment.status');
  
 		Route::post('/payment/store', 'PaymentController@submitPayment')->name('payment.store');
 
-		Route::post('/notification/handler', 'PaymentController@notificationHandler')->name('notification.handler');
+		Route::get('/setting', 'UserSettingController@index')->name('setting.index');
+
+		Route::post('/setting/store', 'UserSettingController@store')->name('setting.store');
+
+		Route::get('/setting/cache/clear', 'UserSettingController@clearCache')->name('setting.clearCache');
+		
 	});
 
 	/*routes untuk admin*/
@@ -42,7 +49,7 @@ Route::middleware('auth')->group(function(){
 
 		Route::get('/home', 'HomeAdminController@index')->name('admin.home');
 
-		Route::get('/clear_cache', 'ResponseCacheController@clear')->name('clear.cache');
+		Route::get('/cache/clear', 'HomeAdminController@clear')->name('clear.cache');
 
 		Route::resource('users', 'UserManagementController');
 
@@ -53,6 +60,9 @@ Route::middleware('auth')->group(function(){
 	});
 
 });
+
+// No auth
+Route::post('/notification/handler', 'PaymentController@notificationHandler')->name('notification.handler');
 
 
 	

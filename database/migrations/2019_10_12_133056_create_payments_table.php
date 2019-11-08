@@ -15,7 +15,7 @@ class CreatePaymentsTable extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->unsignedInteger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('package_type')->nullable();
@@ -23,6 +23,8 @@ class CreatePaymentsTable extends Migration
             $table->string('status')->default('pending');
             $table->string('snap_token')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

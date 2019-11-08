@@ -21,18 +21,22 @@ class UserRegister implements ShouldBroadcast
 
     public $message;
 
+    public $request;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($user, $package)
+    public function __construct($user, $package, $request)
     {
         $this->user = $user;
 
+        $this->request = $request;
+
         $this->package = Package::whereId($package)->first();
 
-        $this->message = "User {$user->name} baru saja melakukan registrasi dengan paket {$this->package->name}";
+        $this->message = "User $user->name baru saja melakukan registrasi dengan paket {$this->package->name}";
     }
 
     /**
