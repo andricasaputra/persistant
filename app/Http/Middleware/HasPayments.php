@@ -25,7 +25,7 @@ class HasPayments
     {
         if (count($this->repository->hasPendingPayments()) === 0) return $next($request);
            
-        return redirect(route('home'))->withWarning('Maaf anda mempunyai pembayaran yang masih pending, mohon selesaikan terlebih dahulu pembayaran anda :)');
+        return redirect(route('home'))->withWarning('Maaf anda mempunyai pembayaran yang masih pending, silahkan menuju halaman order untuk menyelesaikan pembayaran anda');
 
         return $next($request);
     }

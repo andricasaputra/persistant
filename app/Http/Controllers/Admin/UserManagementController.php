@@ -13,11 +13,15 @@ use App\Http\Requests\UserRegisterRequest;
 
 class UserManagementController extends Controller
 {
-    protected $repository;
+    protected $repository, $paymentRepository;
 
     public function __construct(UserRepository $repository)
     {
         $this->repository = $repository;
+
+        $this->paymentRepository = app('Payments')->init(
+            config('e-persistant.payments_gateway.default')
+        );
     }
 
     /**
@@ -63,9 +67,11 @@ class UserManagementController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        return redirect('users'); 
+        $status = $this->repository->paymentStatus($user);
+
+        return view('admin.users.show')->withPayments($status); 
     }
 
     /**

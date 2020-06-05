@@ -28,6 +28,10 @@
                 <i class="fa fa-gear m-r-10"></i> Setting</i></a>
             </li>
             <li>
+                <a href="{{ route('info') }}" class="waves-effect">
+                <i class="fa fa-info m-r-10"></i>General Info</i></a>
+            </li>
+            <li>
                 <a href="{{ route('logout') }}" class="waves-effect" onclick="event.preventDefault();
                     document.getElementById('logout-form').submit();">
                 <i class="fa fa-power-off m-r-10"></i> Logout</i></a>

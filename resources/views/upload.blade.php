@@ -2,6 +2,10 @@
 
 @section('title', 'Upload')
 
+@section('links')
+<link rel="stylesheet" href="{{ asset('css/bootstrap-datepicker.min.css') }}">
+@endsection
+
 @section('breadcrumb')
 
 <div class="row page-titles">
@@ -12,9 +16,7 @@
         </ol>
     </div>
     <div class="col-md-6 col-4 align-self-center">
-        <button class="btn pull-right hidden-sm-down btn-success">
-            Tipe file harus berupa excel
-        </button>
+        <a href="{{ route('info') }}" class="btn pull-right hidden-sm-down btn-success">Unduh Format Excel Disini</a>
     </div>
 </div>
 
@@ -24,39 +26,27 @@
     
     <style>
         label{
-            font-weight: bold!important;
+            font-weight: bold !important;
         }
     </style>
 
-    <!-- ============================================================== -->
-    <!-- End Bread crumb and right sidebar toggle -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Start Page Content -->
-    <!-- ============================================================== -->
-    <!-- Row -->
     <div class="row">
-        <!-- Column -->
-        <!-- Column -->
-        <!-- Column -->
         <div class="col-lg-8 col-xlg-9 col-md-7 mx-auto">
             <div class="card">
                 <div class="card-block">
                      <form enctype='multipart/form-data' action="{{ route('create') }}" method="post" class="form-horizontal form-material">
                         @csrf
                         <div class="form-group">
-                            <label class="col-md-12 m-b-30">Tanggal (Butir Kegiatan Pada Bulan Tertentu)</label>
-                            <input type="date" class="form-control" name="bulan" value="{{ date('Y-m-d') }}">
+                            <label class="col-md-12 m-b-30">Pilih Bulan</label>
+                            <input type="text" class="form-control tgl-aktivitas" name="tanggal" onchange="getTugasBulan(this.value)">
                         </div>
                         <div class="form-group">
                             <div id="loader"></div>
                             <label class="col-md-12 m-b-30">Pilih Butir Kegiatan</label>
-                            <select id="butir_kegiatan" class="form-control" name="butir_kegiatan" style="width:auto;">
+                            <select name="tj[tj_tb_id]" class="form-control select2" id="field-tugas-bulan" style="width: 100%">
+                                <option value="">-- Pilih bulan terlebih dahulu --</option>
                             </select>
                         </div>
-                        {{-- <div class="form-group" >
-                            <div id="detail_nilai" class="form-group form-inline col-md-12"></div>
-                        </div> --}}
                         <div class="form-group">
                             <label class="col-md-12 m-b-30">Pilih File</label>
                             <div class="col-md-12">
@@ -72,77 +62,39 @@
                 </div>
             </div>
         </div>
-        <!-- Column -->
     </div>
-    <!-- Row -->
-    <!-- ============================================================== -->
-    <!-- End PAge Content -->
-    <!-- ============================================================== -->
+
 @endsection
 
 @section('extra_script')
+
+<script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
 
 <script>
 
     const baseUrl = '{{ config('e-persistant.uri.log') }}';
 
-    const skpBulanUrl = '{{ config('e-persistant.uri.skpBulanan') }}';
-
-    const kuantitasUrl = '{{ config('e-persistant.uri.kuantitasSkp') }}';
-
     const proxy = '{{ config('e-persistant.uri.proxy') }}';
 
-    let nip = $('a#profileNav').data('src');;
-
-    let tanggal = $('input[name="bulan"]');
-
-    function getSkpBulanNew(tanggal) {
-
-       $('#butir_kegiatan').empty();
-
-       $('#butir_kegiatan').prepend(`<option value="-"><i class="fa fa-spin fa-spinner"></i> Loading Butir Kegiatan...</option>`);
-
-        $.ajax({
-            url: proxy + skpBulanUrl,
-            data: {"tanggal": tanggal,"nip": nip},
-            type: "GET",
-            success: function(data){
-                $('#butir_kegiatan').empty();
-                
-                $('#butir_kegiatan').html(data);
-
-                $('#butir_kegiatan').prop('disabled', false);
+    function getTugasBulan(tanggal) {
+      $.ajax({
+            url: `${proxy}${baseUrl}/ajaxGetTugasBulan?nip=`+ '{{ auth()->user()->nip_hashed }}',
+            type: "POST",
+            data: {tanggal},
+            beforeSend : function(){
+              $('#field-tugas-bulan').html('<option><i class="fa fa-spin fa-spinner"></i> Loading...</option>');
             },
-            error: function(err){
-
-                alert('E-personal error saat load data butir kegiatan anda, silahkan coba lagi dalam beberapa saat');
-
-                location.reload();
-            }
+            success: function(response) {
+              res = JSON.parse(response);
+              $('#field-tugas-bulan').html(res.tugasbulan);
+            },
         });
-
     }
 
-    getSkpBulanNew(tanggal.val());
-
-    // Panggil butir kergiatan sesuai tanggal yang dipilih
-    $(tanggal).on('change', function(){
-
-        getSkpBulanNew($(this).val());
-
+    $('.tgl-aktivitas').datepicker({
+        autoclose: true,
+        format:'yyyy-mm-dd'
     });
-
-    // Panggil kuantitas sesuai butir kegiatan yang dipilih
-    // $('#butir_kegiatan').on('change', function(){
-
-    //     let id = $(this).val();
-
-    //     $('#detail_nilai')
-    //     .html('<div style="margin: auto"><i class="fa fa-spin fa-spinner"></i></div>')
-    //     .load(proxy + kuantitasUrl + '?id=' + id);
-
-    // });
-
 </script>
 
 @endsection

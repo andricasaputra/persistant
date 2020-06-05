@@ -20,6 +20,9 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('e_password');
+            $table->string('nip')->nullable();
+            $table->string('id_skp')->nullable();
+            $table->string('nip_hashed')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

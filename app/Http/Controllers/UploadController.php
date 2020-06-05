@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Goutte\Client;
 use Illuminate\Http\Request;
 use App\Http\Requests\UploadRequest;
 use Illuminate\Support\Facades\Artisan;

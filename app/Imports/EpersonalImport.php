@@ -12,6 +12,7 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 class EpersonalImport implements ToCollection, WithMultipleSheets, WithHeadingRow
 {
 	private $rows;
+    private $time;
 
     /**
     * @param Collection $collection
@@ -39,26 +40,29 @@ class EpersonalImport implements ToCollection, WithMultipleSheets, WithHeadingRo
     }
 
     /**
-     * Mengambil data dari row ke 1, 
-     * row ke 1 adalah header, row ke 2 dst adalah data
+     * Mengambil data dari row ke 3, 
+     * row ke 3 adalah header, row ke 4 dst adalah data
      *
      * @return int
      */
     public function headingRow(): int
     {
-        return 1;
+        return 3;
     }
 
     public function prepare($rows)
     {
-    	return $rows->map(function($row){
+    	return $rows->reject(function($row){
 
-    		$row['tanggal'] = $this->transformDate($row['tanggal'])->toDateString();
-            $row['kuantitas_skp'] = (int) $row['kuantitas_skp'];
-            $row['waktu'] = number_format($row['waktu'], 2);
-            $row['waktu_sd'] = number_format($row['waktu_sd'], 2);
+            return is_null($row['deskripsi']) || is_null($row['output']);       
+
+        })->map(function($row){
+
+    		$row['tanggal_bulantanggaltahun'] = $this->transformDate($row['tanggal_bulantanggaltahun'])->toDateString();
+            $row['realisasi'] = (int) $row['realisasi'];
 
     		return $row;
+
     	});
     }
 

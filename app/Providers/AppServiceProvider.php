@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
         if (admin()) {
             View::composer(['admin.home'], AdminProfileComposer::class);
         } else {
-            View::composer(['home', 'profile', 'log', 'layouts.navbar'], ProfileComposer::class);
+            View::composer(['home', 'profile', 'log', 'layouts.navbar', 'info'], ProfileComposer::class);
         }
 
         Queue::failing(function (JobFailed $event) {

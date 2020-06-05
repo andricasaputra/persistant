@@ -3,8 +3,6 @@
 namespace App\Listeners;
 
 use App\Events\UserRegister;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Notifications\UserRegister as Notification;
 
 class UserRegisterNotification

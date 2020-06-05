@@ -40,7 +40,7 @@
                     </form>
                 </div> 
 
-                <div class="row">
+                {{-- <div class="row">
                     <div class="form-group">
                         <div class="card-block">
                             <h3>Bersihkan Cache</h3>
@@ -50,7 +50,7 @@
                            <a href="{{ route('setting.clearCache') }}" class="btn btn-primary">Clear Cache</a> 
                         </div>
                     </div> 
-                </div>   
+                </div> --}}   
             </div>
         </div>
         <!-- Column -->

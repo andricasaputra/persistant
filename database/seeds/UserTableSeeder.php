@@ -17,7 +17,10 @@ class UserTableSeeder extends Seeder
     		'name' => 'admin',
     		'email' => 'admin@mail.com',
     		'password' => bcrypt('admin123'),
-    		'e_password' => 'admin123'
+    		'e_password' => 'admin123',
+            'nip' => null,
+            'id_skp' => null,
+            'nip_hashed' => null,
     	]);
 
         $user->assignRole('administrator');

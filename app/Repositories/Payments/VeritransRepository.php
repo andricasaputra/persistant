@@ -58,7 +58,7 @@ class VeritransRepository implements PaymentsInterface
 	                    'id'       => $payment->package_type,
 	                    'price'    => $payment->amount,
 	                    'quantity' => 1,
-	                    'name'     => ucwords($payment->package_type)
+	                    'name'     => 'Paket ' . $payment->package_type
 	                ]
 	            ]
 	        ];
@@ -84,28 +84,35 @@ class VeritransRepository implements PaymentsInterface
 
 	public function status($id)
 	{
-		$payment = Payment::find($id);
+		try {
 
-		if ($payment->package_type != 'trial') {
+			$payment = Payment::find($id);
 
-			$status = Veritrans_Transaction::status($id);
+			if ($payment->package_type != 'trial') {
 
-			// Jika status payment user tidak sama dengan midtrans
-			// transaction status, maka update status payment user
-			if ($payment->status != $status->transaction_status) {
+				$status = Veritrans_Transaction::status($id);
 
-				$payment->update(['status' => $status->transaction_status]);
+				// Jika status payment user tidak sama dengan midtrans
+				// transaction status, maka update status payment user
+				if ($payment->status != $status->transaction_status) {
 
-				$this->updatePackage($payment);
+					$payment->update(['status' => $status->transaction_status]);
+
+					$this->updatePackage($payment);
+				}
+
+			} else {
+
+				$status = null;
+
 			}
 
-		} else {
-
-			$status = null;
-
+			return $status;
+			
+		} catch (\Exception $e) {
+			
+			return false;
 		}
-
-		return $status;
 	}
 
 	/**

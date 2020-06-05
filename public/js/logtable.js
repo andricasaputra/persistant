@@ -129,9 +129,7 @@ $(document).ready(function() {
                 { targets : [10],
                   render : function (data, type, row) { 
                     return `<div style="width: 80px;">
-                        <a id="editLog" class="btn btn-xs btn-primary btn-flat" href="#" data-href="${proxy}${logUrl}FormEditLog2.php?il=${row['id_log']}">
-                            <span class="fa fa-edit fa-fw"></span>Edit
-                        </a>
+                        
                         <a class="btn btn-xs btn-danger btn-flat" id="deleteLog"
                         href="#" data-href="${proxy}${logUrl}QryDelLog.php?il=${row['id_log']}&d=${row['lampiran']}&skpbulan=${row['id']}"
                         >
@@ -149,6 +147,10 @@ $(document).ready(function() {
         });
 
     }
+
+    /*<a id="editLog" class="btn btn-xs btn-primary btn-flat" href="#" data-href="${proxy}${logUrl}FormEditLog2.php?il=${row['id_log']}">
+                            <span class="fa fa-edit fa-fw"></span>Edit
+                        </a>*/
 
     logTable(logApiUrl);
 

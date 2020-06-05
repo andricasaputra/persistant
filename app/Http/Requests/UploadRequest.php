@@ -24,7 +24,7 @@ class UploadRequest extends FormRequest
     public function rules()
     {
         return [
-            'butir_kegiatan' => 'required',
+            'tj.tj_tb_id' => 'required',
             'filenya' => 'required|mimes:xls,xlsx'
         ];
     }

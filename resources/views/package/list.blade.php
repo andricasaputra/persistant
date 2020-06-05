@@ -54,7 +54,7 @@
 		            <td>{{ $payment->created_at }}</td>
 		            <td>
 		                @if ($payment->status == 'pending')
-		                	<button class="btn btn-success" onclick="orderDetails('{{ $payment->snap_token }}')" style="margin-bottom: 10px">Info pembayaran</button>
+		                	<button class="btn btn-success" onclick="orderDetails('{{ $payment->snap_token }}')" style="margin-bottom: 10px">Pembayaran</button>
 		                @endif
 		                <a href="{{ route('payment.status', $payment->id) }}" class="btn btn-warning">Status</a>
 		            </td>

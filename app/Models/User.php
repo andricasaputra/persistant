@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'e_password'
+        'name', 'email', 'password', 'e_password', 'nip'
     ];
 
     /**
@@ -40,17 +40,6 @@ class User extends Authenticatable
 
     protected $guard_name = 'api';
 
-    public function packages()
-    {
-        return $this->belongsToMany(Package::class)
-                    ->withPivot('valid_until');
-    }
-
-    public function scopeWithNoAdmin($query)
-    {
-        $query->where('id', '!=', 1);
-    }
-
     public function payments()
     {
         return $this->hasMany(Payment::class);
@@ -64,5 +53,15 @@ class User extends Authenticatable
     public function failedJob()
     {
         return $this->hasMany(UserFailedJobs::class);
+    }
+
+    public function packages()
+    {
+        return $this->belongsToMany(Package::class)->withPivot('valid_until');
+    }
+
+    public function scopeWithNoAdmin($query)
+    {
+        $query->where('id', '!=', 1);
     }
 }

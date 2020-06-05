@@ -11,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class UserRegister implements ShouldBroadcast
+class UserRegister
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -37,21 +37,5 @@ class UserRegister implements ShouldBroadcast
         $this->package = Package::whereId($package)->first();
 
         $this->message = "User $user->name baru saja melakukan registrasi dengan paket {$this->package->name}";
-    }
-
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
-    public function broadcastOn()
-    {
-        // return new PrivateChannel('channel-name');
-        return ['users'];
-    }
-
-    public function broadcastAs()
-    {
-         return 'user-register';
     }
 }

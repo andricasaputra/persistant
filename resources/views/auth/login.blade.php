@@ -14,6 +14,10 @@
 
             @include('layouts.message')
 
+            <div class="alert alert-success text-center" style="font-weight: 500; margin-top: 5%">
+                <b><a href="{{ route('register') }}">klik disini untuk registrasi</a></b>
+            </div>
+
             <span class="login100-form-title">
                 Member Login
             </span>
@@ -42,7 +46,7 @@
 
             <div class="text-center p-t-12">
                 <span class="txt1">
-                    Forgot
+                    Lupa
                 </span>
                 <a class="txt2" href="{{ route('password.request') }}">
                     Username / Password?
@@ -51,7 +55,7 @@
 
             <div class="text-center p-t-136">
                 <a class="txt2" href="{{ route('register') }}">
-                    Create your Account
+                    Register disini
                     <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
                 </a>
             </div>

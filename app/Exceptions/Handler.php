@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($exception instanceof ConnectException) {
+        /*if ($exception instanceof ConnectException) {
             return abort('500');
         }
 
@@ -64,7 +64,7 @@ class Handler extends ExceptionHandler
 
             return response()->view('errors.' . $this->statusCode, [], $this->statusCode);
         }
-
+*/
         return parent::render($request, $exception);
     }
 

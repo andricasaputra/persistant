@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use DB;
 use App\Models\User;
 use App\Models\Package;
 use App\Events\UserRegister;
@@ -18,14 +19,14 @@ class UserRepository
         return auth()->user();
     }
 
-    public function getProfile($key = null)
-    {
-        return isset($key) ? $this->profile[$key] : $this->profile;
-    }
-
     public function setProfile(array $profile) 
     {
         $this->profile = $profile;
+    }
+
+    public function getProfile($key = null)
+    {
+        return isset($key) ? $this->profile[$key] : $this->profile;
     }
 
 	public function all()
@@ -35,20 +36,34 @@ class UserRepository
 
 	public function store($request)
 	{
-		$name = explode('@', $request->email);
+        DB::beginTransaction();
 
-        $name = $name[0];
+        try {
 
-        $user = User::create([
-            'name' => $name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'e_password' => $request->password,
-        ]);
+            $name = explode('@', $request->email);
 
-        event(new UserRegister($user, $request->id, $request->all()));
+            $name = $name[0];
 
-        return $user;
+            $user = User::create([
+                'name' => $name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'e_password' => $request->password,
+            ]);
+
+            event(new UserRegister($user, $request->id, $request->all()));
+
+            DB::commit();
+
+            return $user;
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+            
+            throw new \Exception($e->getMessage(), 1);
+        }
+		
 	}
 
 	public function edit($id)

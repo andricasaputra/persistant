@@ -3,8 +3,11 @@
 namespace App\Providers;
 
 use Goutte\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
+
+ini_set('max_execution_time', 500);
 
 class EpersonalServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -15,7 +18,9 @@ class EpersonalServiceProvider extends ServiceProvider implements DeferrableProv
      */
     public function register()
     {
-        $this->login();
+        $this->setClient();
+
+        $this->jumperLogin();
 
         $this->logout(); 
 
@@ -32,34 +37,97 @@ class EpersonalServiceProvider extends ServiceProvider implements DeferrableProv
         //
     }
 
-    private function login()
+    private function setClient()
     {
         $this->app->singleton(Client::class, function($app) {
+            return new Client;
+        });
+    }
 
-            $client =  new Client;
+    private function jumperLogin()
+    {
+        $this->app->singleton('Login', function($app) {
 
-            $loginUri = $app['config']->get('e-persistant.uri.login');
-    
-            $crawler = $client->request('GET', $loginUri);
+            $client = app(Client::class);
 
-            $form = $crawler->selectButton('Login')->form();
+            $user = auth()->user();
 
-            $form['admin'] = auth()->user()->name;
-            
-            $form['kunci'] = auth()->user()->e_password;
+            $nip = $user->nip;
 
-            $client->submit($form);
+            if (is_null($nip) && customer()) {
+                $nip = $this->getNip();
+            }
+
+            if (is_null($user->id_skp) || is_null($user->nip_hashed)) {
+
+                $data = $this->getHashedNip($nip);
+
+                $user->id_skp = $data['id_skp'];
+                $user->nip_hashed = $data['nip_hashed'];
+
+                $user->save();
+            }
+
+            $loginUri = config('e-persistant.uri.login');
+
+            $client->request('GET', $loginUri . $user->nip_hashed);
 
             return $client;
-
         });
+    }
+
+    private function getNip()
+    {
+        $client = app(Client::class);
+        $loginUri = config('e-persistant.simasn.uri.login');
+        $homeUri = config('e-persistant.simasn.uri.home');
+        $inputLoginXpath = config('e-persistant.simasn.input.loginXpath');
+        $input['username'] = config('e-persistant.simasn.input.name.username');
+        $input['password'] = config('e-persistant.simasn.input.name.password');
+
+        $crawler = $client->request('GET', $loginUri);
+        $form = $crawler->filterXPath($inputLoginXpath)->form();
+
+        $form[$input['username']] = auth()->user()->name;
+        $form[$input['password']] = auth()->user()->e_password;
+
+        $client->submit($form);
+
+        $crawler = $client->request('GET', $homeUri);
+
+        $nip = $crawler->filter('#nip')->attr('value');
+
+        auth()->user()->update(['nip' => $nip]);
+
+        return $nip;
+    }
+
+    private function getHashedNip($nip)
+    {
+        $client = app(Client::class);
+        
+        $loginUri = config('e-persistant.uri.login');
+
+        $nip = file_get_contents(config('e-persistant.encode') . $nip);
+
+        $client->request('GET', $loginUri . $nip);
+
+        $logUri = config('e-persistant.uri.log');
+
+        $crawler = $client->request('GET', $logUri);
+
+        $id_skp = $crawler->filterXpath('//*[@id="modal-buat-catatan"]/div/div/form/div[1]/input[1]')->attr('value');
+
+        $nip_hashed = $crawler->filterXpath('//*[@id="modal-buat-catatan"]/div/div/form/div[1]/input[2]')->attr('value');
+
+        return compact('id_skp', 'nip_hashed');
     }
 
     private function logout()
     {
         $this->app->singleton('Logout', function($app) {
 
-            $client = $app[Client::class];
+            $client = $app['Login'];
 
             $profileUri = $app['config']->get('e-persistant.uri.profile');
 
@@ -76,43 +144,33 @@ class EpersonalServiceProvider extends ServiceProvider implements DeferrableProv
     {
         $this->app->singleton('Profile', function($app) {
 
-            $client = $app[Client::class];
+            $client = $app['Login'];
 
-            $profileUri = $app['config']->get('e-persistant.uri.profile');
+            $logUri = $app['config']->get('e-persistant.uri.log');
 
             try {
-        
-                $crawler = $client->request('GET', $profileUri);
 
-                $datas = $crawler->filter('table')->filter('tr')->each(function ($tr, $i) {
+                $cookieJar = CookieJar::fromArray([
+                    'username' => auth()->user()->username
+                ], $logUri);
 
-                    return $tr->filter('td')->each(function ($td, $i) {
+                $crawler = $client->request('GET', $logUri, ['cookies' => $cookieJar]);
 
-                        return $td->filter('td')->text();
-                    });
-
+                $datas = $crawler->filter('.sidebar-menu div span')->each(function($span){
+                    return $span->text();
                 });
 
-                $image = $crawler->filter('img')->eq(2)->attr('src');
+                array_push($datas, $crawler->filter('.img')->attr('src'));
 
-                $result = [];
+                $keys = ['jabatan', 'nama', 'nip', 'foto'];
 
-                foreach ($datas as $data) {
-                    if (! empty($data)) {
-                        $result += [
-                            strtolower(str_replace(' ', '_', $data[0])) => $data[2]
-                        ];
-                    }
-                }
+                $datas = array_combine($keys, $datas);
 
-                $result += ['foto' => $image];
-
-                return $result;
+                return $datas;
 
             } catch (\InvalidArgumentException $e) {
 
                 return abort('500');
-
             }
 
         });

@@ -65,6 +65,10 @@ class PaymentController extends Controller
     { 
         $status = $this->repository->status($id);
 
+        if (! $status) {
+            return back()->withWarning('Mohon lakukan transaksi pembayaran terlebih dahulu sebelum memeriksa status pembayaran');
+        }
+
         if (trial() && is_null($status)) {
 
             return view('package.trial_status');

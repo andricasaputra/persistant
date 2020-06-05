@@ -24,9 +24,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->everyMinute();
-
         $schedule->command('queue:work --daemon --tries=2 --sleep=5')
         ->cron('* * * * *')
         ->withoutOverlapping();
@@ -63,6 +60,7 @@ class Kernel extends ConsoleKernel
         if (!empty($result)) {
             return true;
         }
+        
         return false;
     }
 }

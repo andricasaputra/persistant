@@ -51,7 +51,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 }
 </script> --}}
 
-<script src="https://js.pusher.com/5.0/pusher.min.js"></script>
+{{-- <script src="https://js.pusher.com/5.0/pusher.min.js"></script>
 
 <script>
   //instantiate a Pusher object with our Credential's key
@@ -71,4 +71,4 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
         $('.dropdown-count').html(data.length + 1); 
         $('#main_notifications').prepend(listItem);
   }
-</script>
+</script> --}}

@@ -22,4 +22,9 @@ trait hasPayments
         			->whereStatus('pending')
         			->get();
     }
+
+    public function paymentStatus($user)
+    {
+        return $user->payments()->get();
+    }
 }

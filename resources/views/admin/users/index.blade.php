@@ -41,6 +41,8 @@
                                     {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-xs confirm']) !!}
                                     {!! Form::close() !!}
 
+                                    <a href="{{ route('user.payment.status', $user->id) }}" class="btn btn-warning btn-xs">Status</a>
+
                                     </td>
                                 </tr>
                                 @endforeach

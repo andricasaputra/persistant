@@ -5,13 +5,15 @@ namespace App\Repositories\Uploads;
 use Goutte\Client;
 use App\Http\Controllers\Concern\WithExcel;
 
-ini_set('max_execution_time', '300');
+ini_set('max_execution_time', '500');
 
 class Sync
 {
 	use WithExcel;
 
 	protected $client;
+
+	protected $login;
 
 	protected $request;
 
@@ -30,57 +32,57 @@ class Sync
 	{
 		try {
 
+			$this->login = resolve('Login');
+
 			$crawler = $this->client->request('GET', $this->destinationUri);
 
-			$form = $crawler->selectButton('upload')->form();
+			$form = $crawler->filterXpath('//*[@id="modal-buat-catatan"]/div/div/form')->form();
 
 			$method = $form->getMethod();
 
 			$uri  = $form->getUri();
 
-			$values = $this->formatValues($form->getPhpValues());
+			$values = $form->getPhpValues();
 
 			// Import data dari excel
 			$rows = $this->setImporterClass($this->request)->getRows();
 
-			$process = $rows->reject(function($row){
+			$process = $rows->each(function($row) use ($values, $method, $uri) {
 
-				return is_null($row['kegiatan']) || $this->request->butir_kegiatan === 0;		
+				$row['jam_dari'] = gmdate("h:i", $this->convertTime($row['jam_dari']));
+	            $row['jam_sampai'] = gmdate("h:i", $this->convertTime($row['jam_sampai']));
 
-			})->each(function($row) use ($values, $method, $uri) {
-
-				$values['kuantitas_skp'] = $row['kuantitas_skp'];
-				$values['skpbulan'] = $this->request->butir_kegiatan;
-				$values['tanggal'] =  $row['tanggal'];
-				$values['waktu'] = $row['waktu'];
-            	$values['waktu_sd'] = $row['waktu_sd'];
-				$values['jenis_tugas'] = $row['jenis_tugas'];
-				$values['kegiatan'] = $row['kegiatan'];
-				$values['output'] = $row['output'];
+				$values['tj']['tj_tb_id'] = $this->request->tj['tj_tb_id'];
+				$values['tanggal'] =  $row['tanggal_bulantanggaltahun'];
+				$values['jam_dari'] = $row['jam_dari'];
+            	$values['jam_sampai'] = $row['jam_sampai'];
+				$values['jenis_tugas'] = 'Jabatan';
+				$values['tj']['tj_realisasi'] = $row['realisasi'];
+				$values['tj']['tj_deskripsi'] = $row['deskripsi'];
+				$values['tj']['tj_output'] = $row['output'];
+				$values['penjadwalankerja'] = 'WFO';
 
 				$this->client->request($method, $uri, $values);
 
 			});
 
 			return $process->count();
+			
+		} catch (\Exception $e) {
 
-		} catch (\InvalidArgumentException $e) {
-
-		    return false;
+			return false;
+			
 		}
 	}
 
+	protected function convertTime($decimal) 
+    {
+        return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToTimestamp($decimal);
+    }
+
 	protected function formatValues(array $values)
 	{
-		unset(
-			$values['upload'], 
-			$values['tugas_tambahan'], 
-			$values['nomer_surat'],
-			$values['foto'],
-			$values['fupload']
-		); 
-
-		$values['kuantitas_skp'] = '';
+		unset($values['tm']); 
 
 		return $values;
 	}

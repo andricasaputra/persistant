@@ -17,6 +17,13 @@
 
              @include('layouts.message')
 
+            <div class="alert alert-success text-left" style="font-weight: 500; margin-top: 5%">
+                <ol>
+                    <li>- Email address merupakan email pertanian anda yang digunakan pada ekinerja</li>
+                    <li>- Password merupakan kata sandi ada pada ekinerja</li>
+                </ol>
+            </div>
+
             <span class="login100-form-title">
                 Register
             </span>
@@ -73,17 +80,17 @@
 
             <div class="text-center p-t-12">
                 <span class="txt1">
-                    Already have account?
+                    Sudah punya akun?
                 </span>
                 <a class="txt2" href="{{ route('login') }}">
-                   Login
+                   Login disini
                 </a>
             </div>
 
             <div class="text-center p-t-136">
                 <a class="txt2" href="{{ route('login') }}">
                     <i class="fa fa-long-arrow-left m-l-5" aria-hidden="true"></i>
-                    Back to login
+                    Kembali ke login
                 </a>
             </div>
         </form>

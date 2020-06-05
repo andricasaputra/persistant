@@ -3,6 +3,7 @@
 
 <head>
     @include('layouts.header')
+    @yield('styles')
 </head>
 
 <body class="fix-header fix-sidebar card-no-border">

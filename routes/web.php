@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
+
 Auth::routes();
 
 Route::middleware('auth')->group(function(){
@@ -41,6 +43,10 @@ Route::middleware('auth')->group(function(){
 		Route::post('/setting/store', 'UserSettingController@store')->name('setting.store');
 
 		Route::get('/setting/cache/clear', 'UserSettingController@clearCache')->name('setting.clearCache');
+
+		Route::get('/info', 'HomeController@info')->name('info');
+
+		Route::get('/download', 'HomeController@getDownload')->name('download.format');
 		
 	});
 
@@ -53,12 +59,24 @@ Route::middleware('auth')->group(function(){
 
 		Route::resource('users', 'UserManagementController');
 
+		Route::get('/status/{user}', 'UserManagementController@show')->name('user.payment.status');
+
 		Route::resource('roles', 'RoleController');
 
 		Route::resource('permissions', 'PermissionController');
 
 	});
 
+});
+
+Route::get('clear-all', function(){
+    Artisan::call('clear-compiled');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    Artisan::call('config:clear');
+
+    return redirect()->route('home');
 });
 
 // No auth
