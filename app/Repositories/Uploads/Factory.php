@@ -2,16 +2,16 @@
 
 namespace App\Repositories\Uploads;
 
-class UploadFactory
+class Factory
 {
 	public static function init($request)
 	{
 		$setting = auth()->user()->setting()->first();
 
 		if ($setting->upload_setting == 'sync') {
-			return new Sync($request);
+			return Sync::process($request);
 		} else {
-			return new Async($request);
+			return Async::process($request);
 		}
 
 		throw new \Exception("You need to set upload setting first", 1);

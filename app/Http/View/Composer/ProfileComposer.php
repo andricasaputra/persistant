@@ -30,13 +30,13 @@ class ProfileComposer
     {
         if (! session()->has('profile')) {
 
-            session()->put('profile', app('Profile'));
+            session()->put('profile', resolve('Profile')->profile());
         }
 
         $profile = session('profile', function(){
 
             //callback
-            session()->put('callback_profile', app('Profile'));
+            session()->put('callback_profile', resolve('Profile')->profile());
 
             return 'callback_profile';
         });

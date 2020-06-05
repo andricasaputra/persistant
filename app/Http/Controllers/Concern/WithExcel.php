@@ -7,21 +7,19 @@ use App\Imports\EpersonalImport;
 
 trait WithExcel
 {
-	protected $rows;
+	protected static $rows;
 
-	public function setImporterClass($request)
+	protected static function setImporterClass($request)
 	{
 		$importClass = new EpersonalImport();
 
 		Excel::import($importClass, $request->file('filenya'));
 
-		$this->rows = $importClass->getRows();
-
-		return $this;
+		return static::$rows = $importClass->getRows();
 	}
 
-	public function getRows()
+	protected static function getRows()
 	{
-		return $this->rows;
+		return static::$rows;
 	}
 }

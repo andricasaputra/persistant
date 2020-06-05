@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Goutte\Client;
-use Illuminate\Http\Request;
 use App\Http\Requests\UploadRequest;
+use App\Repositories\Uploads\Factory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use App\Repositories\Uploads\UploadFactory as Factory;
 
 class UploadController extends Controller
 {
@@ -22,16 +21,19 @@ class UploadController extends Controller
 
 	public function create(UploadRequest $request)
 	{
-		$factory = Factory::init($request);
+		$upload = Factory::init($request);
 
-		$upload = $factory->make();
-
-		if ($upload === false) {
-
+		if ($upload === false){
 			return back()->withWarning("Terjadi kesalahan pada server, silahkan coba beberapa saat lagi");
 		}
-
-		return back()->withSuccess("$upload data berhasil diupload ke E-Personal anda");
+			
+		$setting = auth()->user()->setting()->first();
+		
+		if ($setting->upload_setting == 'sync'){
+			return back()->withSuccess("$upload data berhasil diupload ke E-Personal anda");
+		}
+			
+		return back()->withSuccess("$upload data berhasil dimasukkan ke dalam antrian untuk diupload ke E-personal");
 	}
 
 	public function showFailedJob()
