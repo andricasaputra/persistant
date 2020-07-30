@@ -6,18 +6,29 @@
     select{
         outline: none;
     }
+
+    .container{
+        width: 50%;
+        margin-top: 100px;
+    }
+
+    @media (max-width: 600px) {
+        .container{
+            width: 100%;
+        }
+    }
 </style>
 
-<div class="container-login100">
-    <div class="wrap-login100 text-center">
+<div class="container">
+    <div class="col-md-12 wrapper">
 
-        <form class="validate-form" autocomplete="off" method="POST" action="{{ route('register') }}" style="margin: auto; width: 100%; margin-left: 6%">
+        <form class="validate-form" autocomplete="off" method="POST" action="{{ route('register') }}">
 
              @csrf
 
              @include('layouts.message')
 
-            <div class="alert alert-success text-left" style="font-weight: 500; margin-top: 5%">
+            <div class="alert alert-success text-left" style="font-weight: 500;">
                 <ol>
                     <li>- Email address merupakan email pertanian anda yang digunakan pada ekinerja</li>
                     <li>- Password merupakan kata sandi ada pada ekinerja</li>
@@ -49,7 +60,7 @@
 
 
             <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-                <input class="input100" id="email" type="email" name="email" value="{{ old('email') }}" required placeholder="Email Address">
+                <input class="input100" id="email" type="email" name="email" value="{{ old('email') }}" required placeholder="Email @pertanian">
                 <span class="focus-input100"></span>
                 <span class="symbol-input100">
                     <i class="fa fa-envelope" aria-hidden="true"></i>
@@ -57,7 +68,7 @@
             </div>
 
             <div class="wrap-input100 validate-input" data-validate = "Password is required">
-                <input class="input100" id="password" type="password" name="password" required placeholder="Password">
+                <input class="input100" id="password" type="password" name="password" required placeholder="Password E-kinerja">
                 <span class="focus-input100"></span>
                 <span class="symbol-input100">
                     <i class="fa fa-lock" aria-hidden="true"></i>
@@ -65,7 +76,7 @@
             </div>
 
             <div class="wrap-input100 validate-input" data-validate = "Password Confirmation is required">
-                <input class="input100" type="password" name="password_confirmation" required  placeholder="Password Confirmation">
+                <input class="input100" type="password" name="password_confirmation" required  placeholder="Konfirmasi Password E-kinerja">
                 <span class="focus-input100"></span>
                 <span class="symbol-input100">
                     <i class="fa fa-lock" aria-hidden="true"></i>
@@ -87,7 +98,7 @@
                 </a>
             </div>
 
-            <div class="text-center p-t-136">
+            <div class="text-center mt-3">
                 <a class="txt2" href="{{ route('login') }}">
                     <i class="fa fa-long-arrow-left m-l-5" aria-hidden="true"></i>
                     Kembali ke login

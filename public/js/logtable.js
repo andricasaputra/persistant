@@ -1,254 +1,153 @@
-$(document).ready(function() {
+function fetchDatatableUrl(bulan = new Date().getMonth() + 1){
+    const nip = $('input[name=nip]').val();
+    return proxy + baseUrl + `/jsonTugasJabatan?bulan=${bulan}&nip=${nip}`;
+}
 
-    $.extend( true, $.fn.dataTable.defaults, {
-      language: {
-          "sEmptyTable":   "Tidak ada data yang tersedia pada tabel ini",
-          "sProcessing":   "Sedang memproses...",
-          "sLengthMenu":   "Tampilkan _MENU_ entri",
-          "sZeroRecords":  "Tidak ditemukan data yang sesuai",
-          "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
-          "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
-          "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
-          "sInfoPostFix":  "",
-          "sSearch":       "Cari:",
-          "sUrl":          "",
-          "oPaginate": {
-            "sFirst":    "Pertama",
-            "sPrevious": "Sebelumnya",
-            "sNext":     "Selanjutnya",
-            "sLast":     "Terakhir"
-          }
-      }
-    });
+$.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings)
+{
+    return {
+        "iStart": oSettings._iDisplayStart,
+        "iEnd": oSettings.fnDisplayEnd(),
+        "iLength": oSettings._iDisplayLength,
+        "iTotal": oSettings.fnRecordsTotal(),
+        "iFilteredTotal": oSettings.fnRecordsDisplay(),
+        "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+        "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+    };
+};
 
-    let nip = $('a#profileNav').data('src');
+function loadtable(url) {
 
-    let bulan = '';
-
-    let tahun = '';
-
-    let key = '';
-
-    const proxy = 'https://cors-anywhere.herokuapp.com/';
-
-    const baseUrl = 'http://ekinerja.pertanian.go.id/epersonalv2/';
-
-    const logUrl = baseUrl + 'ekinerjav2/mlog/';
-
-    const docUrl = 'http://ekinerja.pertanian.go.id/epersonalv2/' + 'doc/log/';
-
-    const sptUrl = 'http://ekinerja.pertanian.go.id/epersonalv2/' + 'doc/log/spt/';
-
-    const secureUrl = proxy + baseUrl;
-
-    let logApiUrl = secureUrl + `ekinerjav2/mlog/index_json.php?nip=${nip}&bulan=${bulan}&tahun=${tahun}&key=${key}`;
-
-    function logTable(url)
-    {
-        $('#log').DataTable( { 
-            "responsive": true,
-            "fixedHeader": true,
-            "paging" : true,
-            "searching": true,
-            "ordering": false,
-            "processing": true,
-            "serverSide": true,
-            "ajax": url,     
-            "columns": [
-                {"data":"id_log", orderable: false},
-                {"data":"bulan"},
-                {"data":"waktu"},
-                {"data":"kuantitas"},
-                {"data":"nilaikuantitas"},
-                {"data":"subkegiatan"},
-                {"data":"kegiatan"},
-                {"data":"output"},
-                {
-                  "data": "spt", 
-                  "defaultContent": ""
-                },
-                {"data":"lampiran"},
-                {"data":"logs"},
-            ],
-            "columnDefs": [ 
-                { targets : [1],
-                  render : function (data, type, row) { 
-                    if (row['tahun']!='' && row['bulan']!='' && row['tgl']!='') {
-                    var html = tglIndo(row['tahun'],row['bulan'],row['tgl']);
-                    } else {
-                    var html = '-';
-                    }
-                    return html;
-                  }
-                },
-                { targets : [2],
-                  render : function (data, type, row) { 
-                    var html = row['waktu']+'<br>'+row['waktu_sd'];
-                    return html;
-                  }
-                },
-                { targets : [4],
-                  render : function (data, type, row) { 
-                    if (row['is_dinilai']) {
-                        var html = row['nilaikuantitas'];
-                    } else {
-                        var html = '-';
-                    }
-                    return html;
-                  }
-                },
-                { targets : [8],
-                  render : function (data, type, row) { 
-                    // console.log(row['spt'])
-                    if (row['spt'] != '') {
-
-                        var html = `<a href="${sptUrl}${row['spt']}" target="_blank"><img src='images/cek.jpg' border='0' width='20' height='20'></a>`;
-
-                    } else if(row['name'] !='') {
-
-                        var html = `<center><a href="${sptUrl}${row['id_log']}" target="_blank"><img src='images/cek.jpg' border='0' width='20' height='20'></a></center>`;
-                    }
-
-                    return html;
-                  } 
-                },
-                { targets : [9],
-                  render : function (data, type, row) { 
-                    if(row['lampiran'] == "") {
-
-                        var html = "";
-
-                    } else if(row['lampiran'] !== "") {
-
-                        var html = `<center><a href="${docUrl}${row['lampiran']}" target="_blank"><img src='images/cek.jpg' border='0' width='20' height='20'></a></center>`;
-                    }
-
-                    return html;
-                  }
-                },
-                { targets : [10],
-                  render : function (data, type, row) { 
-                    return `<div style="width: 80px;">
-                        
-                        <a class="btn btn-xs btn-danger btn-flat" id="deleteLog"
-                        href="#" data-href="${proxy}${logUrl}QryDelLog.php?il=${row['id_log']}&d=${row['lampiran']}&skpbulan=${row['id']}"
-                        >
-                            <i class="fa fa-remove"></i>
-                        </a>
-                    </div>`
-                    
-                  }
+    var t = $("#mytable").dataTable({
+      initComplete: function() {
+          var api = this.api();
+          $('#mytable_filter input')
+                  .off('.DT')
+                  .on('keyup.DT', function(e) {
+                      if (e.keyCode == 13) {
+                          api.search(this.value).draw();
+              }
+          });
+      },
+      oLanguage: {
+          sProcessing: "loading..."
+      },
+      destroy: true,
+      processing: true,
+      serverSide: true,
+      ajax: {
+        "url": url, 
+        "type": "POST"
+      },
+      columns: [
+          {"data": "id","orderable": false},
+          {"data": "tj_tanggal"},
+          {"data": "tj_jam_dari"},
+          {"data": "tb_kuantitas"},
+          {"data": "tj_realisasi"},
+          {"data": "tb_tt_tugasjabatan"},
+          {"data": "tj_deskripsi"},
+          {"data": "tj_output"},
+          {"data": "tj_file_laporan"},
+          {"data": "tj_file_laporan_harian"},
+          {"data": "tj_created_at"},
+          {"data": "id"},
+      ],
+      order: [[1, 'desc']],
+      // scrollX: true, 
+      columnDefs : [ 
+          { targets : [1],
+            render : function (data, type, row, meta) {
+                  var htmls = timeIndonesia(row['tj_tanggal']);
+                  return htmls;
+              }
+          },
+          { targets : [2],
+            render : function (data, type, row, meta) {
+                var htmls = row['tj_jam_dari']+' s/d '+row['tj_jam_sampai'];
+                htmls += '<div style="display:none;">'+row['tj_loc_address']+'</div>';
+                return htmls;
+              }
+          },
+          { targets : [8],
+            render : function (data, type, row, meta) {
+                var htmls = '';
+                if (row['tj_file_laporan']=='' || row['tj_file_laporan']==null) {
+                  htmls = '<center>-</center>';
+                } else {
+                  htmls = '<center><a href="http://epersonal.pertanian.go.id/'+row['tj_file_laporan']+'" data-toggle="tooltip" title="Download" target="_blank"><i class="fa fa-check text-success"></i></a></center>';
                 }
-            ],
-            dom: 'lBrtip',
-            buttons: [
-                'print'
-            ]
-        });
+                return htmls;
+              }
+          },
+          { targets : [9],
+            render : function (data, type, row, meta) {
+                var htmls = '';
+                if (row['tj_file_laporan_harian']=='' || row['tj_file_laporan_harian']==null) {
+                  htmls = '<center>-</center>';
+                } else {
+                  htmls = '<center><a href="http://epersonal.pertanian.go.id/'+row['tj_file_laporan_harian']+'" data-toggle="tooltip" title="Download" target="_blank"><i class="fa fa-check text-success"></i></a></center>';
+                }
+                return htmls;
+              }
+          },
+          { targets : [10],
+            render : function (data, type, row, meta) {
+              if (row['tj_isdirumah']=='YA') {
+                var kerjadirumah = 'Ya';
+              } else {
+                var kerjadirumah = 'Tidak';
+              }
+                var htmls = '<span style="white-space:nowrap;">Waktu input : '+row['tj_created_at']+'</span><br>';
+                // htmls += 'Kerja Dirumah : '+kerjadirumah+'<br>';
+                htmls += 'Jenis Penjadwalan Kerja : '+row['tj_jenispenjadwalankerja']+'<br>';
+                // if (row['tj_isdirumah']=='YA') {
+                //   htmls += 'Swafoto : <a href="http://epersonal.pertanian.go.id/'+row['tj_swafoto']+'" data-toggle="tooltip" title="Swafoto" target="_blank"><i class="fa fa-eye"></i> Lihat</a>';
+                // }
+                return htmls;
+              }
+          },
+      ],
+   
+      rowCallback: function(row, data, iDisplayIndex) {
+          var info = this.fnPagingInfo();
+          var page = info.iPage;
+          var length = info.iLength;
+          var index = page * length + (iDisplayIndex + 1);
+          $('td:eq(0)', row).html(index);
+      }
+  });
+}
 
+function timeIndonesia(tanggal){
+    var hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    var bulan = ['Januari', 'Februari', 'Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    var gettgl = new Date(tanggal);
+
+    var tanggal = gettgl.getDate();
+    var xhari = gettgl.getDay();
+    var xbulan = gettgl.getMonth();
+    var xtahun = gettgl.getYear();
+
+    var hari = hari[xhari];
+    var bulan = bulan[xbulan];
+    var tahun = (xtahun < 1000) ? xtahun + 1900 : xtahun;
+
+    var html = (hari +', ' + tanggal + ' ' + bulan + ' ' + tahun);
+    return html;
+}
+
+const options = $('select[name="bln"]').children();
+
+options.map(function(key, option) {
+    if(option.value == new Date().getMonth() + 1){
+        option.setAttribute('selected', true);
     }
+});
 
-    /*<a id="editLog" class="btn btn-xs btn-primary btn-flat" href="#" data-href="${proxy}${logUrl}FormEditLog2.php?il=${row['id_log']}">
-                            <span class="fa fa-edit fa-fw"></span>Edit
-                        </a>*/
+$('select[name="bln"]').change(function(){
+    loadtable(fetchDatatableUrl($(this).val()));
+});
 
-    logTable(logApiUrl);
-
-    $('#searchLog').on('submit', function(e){
-
-        e.preventDefault();
-
-        key = $('input[name="key"]').val();
-
-        tahun = $('select[name="tahun"]').val();
-
-        bulan = $('select[name="bln"]').val();
-
-        let nip = $('input[name="nip"]').val();
-
-        logApiUrl = secureUrl + `ekinerjav2/mlog/index_json.php?nip=${nip}&bulan=${bulan}&tahun=${tahun}&key=${key}&txtNipDari=${nip}`;
-
-        $('#log').DataTable().destroy();
-
-        logTable(logApiUrl);
-    });
-
-    $('#cetakAktivitas').click(function(){
-
-        $(this).attr("href", proxy + logUrl + '?cetakLogPekerjaan.php?nip=' + nip);
-
-    });
-
-    // $('#log').on('click', 'tbody td:not(:first-child)', function () {
-    //   var row = this.closest('tr');     //get the clicked row
-
-    //   console.log(row)
-    // });
-
-    // Update Log
-    $('#log').on('click', 'a#editLog', function(e){
-
-        e.preventDefault();
-
-        // $('#modalEdit').modal('show');
-
-        nip = "199401102014031001";
-        id = "6";
-        year = "2019";
-        tanggal = '06-09-2019';
-
-        $.ajax({
-            url : proxy + logUrl + "getSkpBulan.php",
-            data: {"tanggal": tanggal,"nip": nip},
-            type: "GET",
-            success: function(data){
-               console.log(data)
-            }
-        });
-
-    });
-
-   // Delete Log
-    $('#log').on('click', 'a#deleteLog', function(e){
-
-        if (! confirm('Apakah Anda Yakin Ingin Menghapus data ini?')){
-
-            e.stopPropagation(); 
-
-            return; 
-        }
-
-        e.preventDefault();
-
-        let url = $(this).data('href');
-
-        $.get(url, function(data, status){
-
-            $('#log').DataTable().destroy();
-
-            logTable(logApiUrl);
-
-        });
-
-    });
-
-    $('.buttons-print > span').remove();
-
-    $('.buttons-print').html('<span><i class="fa fa-print"></i> Cetak Aktivitas Harian</span>');
-
-    function tglIndo(tahuns,bulans,tgls) {
-        let hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        let bulan = ['Januari', 'Februari', 'Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-        let gettgl = new Date(tahuns,bulans-Number(1),tgls);
-        let tanggal = gettgl.getDate();
-        let xhari = gettgl.getDay();
-        let xbulan = gettgl.getMonth();
-        let xtahun = gettgl.getYear();
-        hari = hari[xhari];
-        bulan = bulan[xbulan];
-        let tahun = (xtahun < 1000) ? xtahun + 1900 : xtahun;
-        let html = (hari +', ' + tanggal + ' ' + bulan + ' ' + tahun);
-        return html;
-    }
-
-});/*End Ready*/
+loadtable(fetchDatatableUrl());

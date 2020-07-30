@@ -86,6 +86,7 @@
             },
             success: function(response) {
               res = JSON.parse(response);
+              console.log(res);
               $('#field-tugas-bulan').html(res.tugasbulan);
             },
         });

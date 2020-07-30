@@ -14,13 +14,10 @@ return [
     */
 
 	'uri' => [
-        'log' => 'http://epersonal.pertanian.go.id/aktivitas-harian/mlog',
-        'addActivity' => 'http://ekinerja.pertanian.go.id/epersonalv2/mpribadi/add2.php',
-        'login' => 'http://epersonal.pertanian.go.id/login/jumperLogin?key=',
-        'profile' => 'http://epersonal.pertanian.go.id/index.php/kinerja-pegawai/dashboard',
+        'log' => 'https://epersonal.pertanian.go.id/aktivitas-harian/mlog',
+        'login' => 'https://epersonal.pertanian.go.id/login/jumperLogin?key=',
+        'profile' => 'https://epersonal.pertanian.go.id/index.php/kinerja-pegawai/dashboard',
         'proxy' => 'https://cors-anywhere.herokuapp.com/',
-        'skpBulanan' => 'http://ekinerja.pertanian.go.id/epersonalv2/ekinerjav2/mlog/getSkpBulan.php',
-        'kuantitasSkp' => 'http://ekinerja.pertanian.go.id/epersonalv2/ekinerjav2/mlog/getKuantitas.php',
     ],
 
     'simasn' => [
@@ -51,7 +48,7 @@ return [
         'tj[tj_output]',
     ],
 
-    'encode' => 'http://epersonal.pertanian.go.id/Fitur/encodeId/',
+    'encode' => 'https://epersonal.pertanian.go.id/Fitur/encodeId/',
 
     /*
     |--------------------------------------------------------------------------
